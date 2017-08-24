@@ -17,6 +17,7 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.launchwrapper.IClassTransformer;
 
 public class ASMTransformer implements IClassTransformer {
@@ -37,9 +38,9 @@ public class ASMTransformer implements IClassTransformer {
 		if (transformedName.equals("net.minecraft.profiler.Profiler")) {
 			return patchProfilerASM(name, basicClass, name.compareTo(transformedName) != 0);
 		}
-		if (transformedName.compareTo("net.minecraft.client.renderer.RenderItem") == 0) {
+		/*if (transformedName.compareTo("net.minecraft.client.renderer.RenderItem") == 0) {
 			return patchRenderItemASM(name, basicClass, name.compareTo(transformedName) != 0);
-		}
+		}*/
 		if (transformedName.compareTo("net.minecraftforge.client.ForgeHooksClient") == 0) {
 			return patchForgeHooksASM(name, basicClass, name.compareTo(transformedName) != 0);
 		}
@@ -51,7 +52,7 @@ public class ASMTransformer implements IClassTransformer {
 		String transformTypeName = "";
 		if (obfuscated){
 			targetMethod = "handleCameraTransforms";
-			transformTypeName = "Lbro$b;";
+			transformTypeName = "Lnet/minecraft/client/renderer/block/model/ItemCameraTransforms$TransformType;";
 		}
 		else {
 			targetMethod = "handleCameraTransforms";
@@ -102,9 +103,9 @@ public class ASMTransformer implements IClassTransformer {
 		String targetMethod = "";
 		String transformTypeName = "";
 		if (obfuscated){
-			targetMethod = "a";
-			itemStackName = "Lafj;";
-			bakedModelName = "Lcbh;";
+			targetMethod = "func_180454_a";
+			itemStackName = "Lnet/minecraft/item/ItemStack;";
+			bakedModelName = "Lnet/minecraft/client/renderer/block/model/IBakedModel;";
 		}
 		else {
 			targetMethod = "renderItem";
@@ -116,7 +117,7 @@ public class ASMTransformer implements IClassTransformer {
 		ClassReader classReader = new ClassReader(bytes);
 		classReader.accept(classNode, 0);
 		
-		List<MethodNode> methods = classNode.methods;
+		/*List<MethodNode> methods = classNode.methods;
 		
 		for (MethodNode m : methods){
 			if (m.name.compareTo(targetMethod) == 0 && m.desc.compareTo("("+itemStackName+bakedModelName+")V") == 0){
@@ -143,12 +144,12 @@ public class ASMTransformer implements IClassTransformer {
                 	MethodInsnNode method = new MethodInsnNode(Opcodes.INVOKESTATIC, "elucent/albedo/util/RenderUtil",
                             "renderItem", "("+itemStackName+")V", false);
                     code.insertBefore(returnNode, method);
-                    //System.out.println("Successfully patched RenderItem!");
+                    System.out.println("Successfully patched RenderItem!");
                 }
                 else {
                 }
 			}
-		}
+		}*/
 		
 		ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
 		classNode.accept(writer);
@@ -161,10 +162,10 @@ public class ASMTransformer implements IClassTransformer {
 		String enableFog = "";
 		String disableFog = "";
 		if (obfuscated){
-			enableLighting = "f";
-			disableLighting = "g";
-			enableLighting = "o";
-			disableLighting = "p";
+			enableLighting = "func_179145_e";
+			disableLighting = "func_179140_f";
+			enableFog = "func_179127_m";
+			disableFog = "func_179106_n";
 		}
 		else {
 			enableLighting = "enableLighting";
@@ -185,15 +186,16 @@ public class ASMTransformer implements IClassTransformer {
 				MethodInsnNode method = new MethodInsnNode(Opcodes.INVOKESTATIC, "elucent/albedo/util/RenderUtil",
                         "enableLightingUniforms", "()V", false);
                 code.insertBefore(code.get(2), method);
+    	    	//System.out.println("Successfully loaded GlStateManager ASM!");
             }
 			if (m.name.compareTo(disableLighting) == 0){
 				InsnList code = m.instructions;
 				MethodInsnNode method = new MethodInsnNode(Opcodes.INVOKESTATIC, "elucent/albedo/util/RenderUtil",
                         "disableLightingUniforms", "()V", false);
                 code.insertBefore(code.get(2), method);
+    	    	//System.out.println("Successfully loaded GlStateManager ASM!");
             }
 		}
-    	//System.out.println("Successfully loaded GlStateManager ASM!");
 		
 		ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
 		classNode.accept(writer);
@@ -205,12 +207,12 @@ public class ASMTransformer implements IClassTransformer {
 		String targetMethod = "";
 		String targetDesc = "";
 		if (obfuscated){
-			targetMethod = "a";
-			entityName = "Lasc;";
-			targetDesc = "(Lasc;FI)V";
+			targetMethod = "func_180546_a";
+			entityName = "Lnet/minecraft/tileentity/TileEntity;";
+			targetDesc = "(Lnet/minecraft/tileentity/TileEntity;FI)V";
 		}
 		else {
-			targetMethod = "renderTileEntity";
+			targetMethod = "render";
 			entityName = "Lnet/minecraft/tileentity/TileEntity;";
 			targetDesc = "(Lnet/minecraft/tileentity/TileEntity;FI)V";
 		}
@@ -259,9 +261,9 @@ public class ASMTransformer implements IClassTransformer {
 		String targetMethod = "";
 		String targetDesc = "";
 		if (obfuscated){
-			targetMethod = "a";
-			entityName = "Lsn;";
-			targetDesc = "(Lsn;DDDFFZ)V";
+			targetMethod = "func_188391_a";
+			entityName = "Lnet/minecraft/entity/Entity;";
+			targetDesc = "(Lnet/minecraft/entity/Entity;DDDFFZ)V";
 		}
 		else {
 			targetMethod = "doRenderEntity";
@@ -311,7 +313,7 @@ public class ASMTransformer implements IClassTransformer {
 	public byte[] patchProfilerASM(String name, byte[] bytes, boolean obfuscated){
 		String targetMethod = "";
 		if (obfuscated){
-			targetMethod = "a";
+			targetMethod = "func_76318_c";
 		}
 		else {
 			targetMethod = "endStartSection";
@@ -368,8 +370,8 @@ public class ASMTransformer implements IClassTransformer {
 		String renderChunkName = "";
 		String targetMethod = "";
 		if (obfuscated){
-			targetMethod = "a";
-			renderChunkName = "Lbte;";
+			targetMethod = "func_178003_a";
+			renderChunkName = "Lnet/minecraft/client/renderer/chunk/RenderChunk;";
 		}
 		else {
 			targetMethod = "preRenderChunk";

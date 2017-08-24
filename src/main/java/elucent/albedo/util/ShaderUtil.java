@@ -17,11 +17,13 @@ import elucent.albedo.Albedo;
 import elucent.albedo.event.ShaderSelectEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.resources.IResourceManager;
+import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ShaderUtil {
+public class ShaderUtil implements IResourceManagerReloadListener {
 	
 	public static int currentProgram = -1;
 	public static int fastLightProgram = 0;
@@ -93,4 +95,9 @@ public class ShaderUtil {
         b.put(bytes);*/
         return s;
     }
+
+	@Override
+	public void onResourceManagerReload(IResourceManager resourceManager) {
+		init();
+	}
 }

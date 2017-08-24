@@ -7,6 +7,7 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GLContext;
 
 import elucent.albedo.event.GatherLightsEvent;
+import elucent.albedo.event.LightUniformEvent;
 import elucent.albedo.event.ProfilerStartEvent;
 import elucent.albedo.event.RenderChunkUniformsEvent;
 import elucent.albedo.event.RenderEntityEvent;
@@ -19,7 +20,7 @@ import elucent.albedo.util.ShaderUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.player.EntityPlayer;
@@ -31,6 +32,8 @@ import net.minecraft.world.DimensionType;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.client.model.ICustomModelLoader;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingJumpEvent;
 import net.minecraftforge.fml.client.config.GuiConfig;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -66,8 +69,13 @@ public class EventManager {
 				GL20.glUniform3f(playerPos, (float)Minecraft.getMinecraft().player.posX, (float)Minecraft.getMinecraft().player.posY, (float)Minecraft.getMinecraft().player.posZ);
 				if (!postedLights){
 					LightManager.update(Minecraft.getMinecraft().world);
+					ShaderUtil.useProgram(0);
+					MinecraftForge.EVENT_BUS.post(new LightUniformEvent());
+					ShaderUtil.useProgram(ShaderUtil.fastLightProgram);
 					LightManager.uploadLights();
 					ShaderUtil.useProgram(ShaderUtil.entityLightProgram);
+					tickLoc = GL20.glGetUniformLocation(ShaderUtil.currentProgram, "ticks");
+					GL20.glUniform1f(tickLoc, (float)ticks + Minecraft.getMinecraft().getRenderPartialTicks());
 					texloc = GL20.glGetUniformLocation(ShaderUtil.currentProgram, "sampler");
 					GL20.glUniform1i(texloc, 0);
 					texloc = GL20.glGetUniformLocation(ShaderUtil.currentProgram, "lightmap");
@@ -126,10 +134,13 @@ public class EventManager {
 				GL20.glUniform1i(texloc, 1);
 				int playerPos = GL20.glGetUniformLocation(ShaderUtil.currentProgram, "playerPos");
 				GL20.glUniform3f(playerPos, (float)Minecraft.getMinecraft().player.posX, (float)Minecraft.getMinecraft().player.posY, (float)Minecraft.getMinecraft().player.posZ);
-				precedesEntities = true;
 			}
 			if (event.getSection().compareTo("hand") == 0){
-				ShaderUtil.useProgram(0);
+				ShaderUtil.useProgram(ShaderUtil.entityLightProgram);
+				int entityPos = GL20.glGetUniformLocation(ShaderUtil.currentProgram, "entityPos");
+				EntityPlayer player = Minecraft.getMinecraft().player;
+				GL20.glUniform3f(entityPos, (float)player.posX, (float)player.posY+player.height/2.0f, (float)player.posZ);
+				precedesEntities = true;
 			}
 			if (event.getSection().compareTo("gui") == 0){
 				isGui = true;
@@ -164,6 +175,7 @@ public class EventManager {
 		}
 	}
 	
+	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
 	public void onRenderLiving(RenderLivingEvent event){
 		if (ConfigManager.enableLights){
@@ -177,6 +189,7 @@ public class EventManager {
 				int colorMult = GL20.glGetUniformLocation(ShaderUtil.currentProgram, "colorMult");
 				GL20.glUniform4f(colorMult, 1.0f, 1.0f, 1.0f, 0.0f);
 			}
+			ICustomModelLoader m;
 		}
 	}
 	
@@ -229,23 +242,17 @@ public class EventManager {
 		}
 	}
 	
-	/*@SubscribeEvent
+	@SubscribeEvent
 	public void onGatherLights(GatherLightsEvent e){
 		if (Minecraft.getMinecraft().player != null){
-			e.getLightList().add(new Light((float)Minecraft.getMinecraft().player.posX,
-					(float)Minecraft.getMinecraft().player.posY,
-					(float)Minecraft.getMinecraft().player.posZ,
-					1, 0, 0, 1, 8));
+			e.getLightList().add(new Light((float)TileEntityRendererDispatcher.staticPlayerX,
+					(float)TileEntityRendererDispatcher.staticPlayerY+0.1f,
+					(float)TileEntityRendererDispatcher.staticPlayerZ,
+					1f, 0.125f, 0.125f, 4f, 4));
+			e.getLightList().add(new Light((float)TileEntityRendererDispatcher.staticPlayerX,
+					(float)TileEntityRendererDispatcher.staticPlayerY+0.1f,
+					(float)TileEntityRendererDispatcher.staticPlayerZ,
+					1f, 0.5f, 0.125f, 0.75f, 14));
 		}
-	}*/
-	
-	@SideOnly(Side.CLIENT)
-	@SubscribeEvent(priority=EventPriority.NORMAL, receiveCanceled=true)
-	public void onEvent(GuiOpenEvent event)
-	{
-	    if (event.getGui() instanceof GuiConfig)
-	    {
-	        event.setGui(new GuiAlbedoConfig(null));        
-	    }
 	}
 }
