@@ -57,7 +57,6 @@ public class ShaderUtil implements IResourceManagerReloadListener {
         try {
         	ARBShaderObjects.glShaderSourceARB(shader, readFileAsString(filename));
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
         OpenGlHelper.glCompileShader(shader);
@@ -76,10 +75,6 @@ public class ShaderUtil implements IResourceManagerReloadListener {
     public static String readFileAsString(String filename) throws Exception {
     	System.out.println("Loading shader ["+filename+"]...");
         StringBuilder source = new StringBuilder();
-        
-        /*FileWriter f = new FileWriter(filename);
-        f.write("TEST");
-        f.close();*/
          
         InputStream in = ShaderUtil.class.getResourceAsStream(filename);
         
@@ -90,9 +85,6 @@ public class ShaderUtil implements IResourceManagerReloadListener {
 				s = reader.lines().collect(Collectors.joining("\n"));
 			}
         }
-        /*byte[] bytes = s.getBytes();
-        ByteBuffer b = ByteBuffer.allocate(bytes.length);
-        b.put(bytes);*/
         return s;
     }
 
