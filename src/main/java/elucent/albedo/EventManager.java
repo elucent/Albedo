@@ -242,7 +242,7 @@ public class EventManager {
 		}
 	}
 	
-	@SubscribeEvent
+	/*@SubscribeEvent
 	public void onGatherLights(GatherLightsEvent e){
 		if (Minecraft.getMinecraft().player != null){
 			e.getLightList().add(new Light((float)TileEntityRendererDispatcher.staticPlayerX,
@@ -254,5 +254,5 @@ public class EventManager {
 					(float)TileEntityRendererDispatcher.staticPlayerZ,
 					1f, 0.5f, 0.125f, 0.75f, 14));
 		}
-	}
+	}*/
 }
