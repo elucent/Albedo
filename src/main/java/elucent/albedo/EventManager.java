@@ -1,9 +1,13 @@
 package elucent.albedo;
 
 import java.awt.Color;
+import java.nio.ByteBuffer;
 
+import org.lwjgl.opengl.EXTFramebufferObject;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GLContext;
 
 import elucent.albedo.event.GatherLightsEvent;
@@ -43,15 +47,40 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import static org.lwjgl.opengl.GL11.*;
+
 public class EventManager {
 	int ticks = 0;
 	boolean postedLights = false;
 	boolean precedesEntities = true;
 	public static boolean isGui = false;
 	String section = "";
+	
+	int fbo = 0;
+	int tex = 0;
+	
+	public EventManager(){
+		/*fbo = EXTFramebufferObject.glGenFramebuffersEXT();
+		tex = GL11.glGenTextures();
+		glBindTexture(GL_TEXTURE_2D, tex);
+		int w = Minecraft.getMinecraft().displayWidth;
+		int h = Minecraft.getMinecraft().displayHeight;
+		byte[] data = new byte[w*h*4];
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_BYTE, ByteBuffer.allocateDirect(w*h*4));*/
+	}
+	
 	@SubscribeEvent
 	public void onProfilerChange(ProfilerStartEvent event){
 		section = event.getSection();
+		/*if (event.getSection().compareTo("camera") == 0){
+			glBindTexture(GL_TEXTURE_2D, tex);
+			EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, fbo);
+			EXTFramebufferObject.glFramebufferTexture2DEXT( EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT,
+	                GL11.GL_TEXTURE_2D, tex, 0);
+			if (Minecraft.getMinecraft().isCallingFromMinecraftThread()){
+				ShaderUtil.useProgram(ShaderUtil.depthProgram);
+			}
+		}*/
 		if (ConfigManager.enableLights){
 			if (event.getSection().compareTo("terrain") == 0){
 				isGui = false;
@@ -96,6 +125,21 @@ public class EventManager {
 				ShaderUtil.useProgram(0);
 			}
 			if (event.getSection().compareTo("litParticles") == 0){
+				ShaderUtil.useProgram(ShaderUtil.fastLightProgram);
+				int texloc = GL20.glGetUniformLocation(ShaderUtil.currentProgram, "sampler");
+				GL20.glUniform1i(texloc, 0);
+				texloc = GL20.glGetUniformLocation(ShaderUtil.currentProgram, "lightmap");
+				GL20.glUniform1i(texloc, 1);
+				int playerPos = GL20.glGetUniformLocation(ShaderUtil.currentProgram, "playerPos");
+				GL20.glUniform3f(playerPos, (float)Minecraft.getMinecraft().player.posX, (float)Minecraft.getMinecraft().player.posY, (float)Minecraft.getMinecraft().player.posZ);
+				int chunkX = GL20.glGetUniformLocation(ShaderUtil.currentProgram, "chunkX");
+				int chunkY = GL20.glGetUniformLocation(ShaderUtil.currentProgram, "chunkY");
+				int chunkZ = GL20.glGetUniformLocation(ShaderUtil.currentProgram, "chunkZ");
+				GL20.glUniform1i(chunkX, 0);
+				GL20.glUniform1i(chunkY, 0);
+				GL20.glUniform1i(chunkZ, 0);
+			}
+			if (event.getSection().compareTo("particles") == 0){
 				ShaderUtil.useProgram(0);
 			}
 			if (event.getSection().compareTo("weather") == 0){
@@ -147,6 +191,29 @@ public class EventManager {
 				ShaderUtil.useProgram(0);
 			}
 		}
+
+		/*if (event.getSection().compareTo("gui") == 0){
+			if (Minecraft.getMinecraft().isCallingFromMinecraftThread()){
+				ShaderUtil.useProgram(0);
+			}
+			//EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, fbo);
+            GlStateManager.viewport(0, 0,  Minecraft.getMinecraft().displayWidth,  Minecraft.getMinecraft().displayHeight);
+            GlStateManager.matrixMode(5889);
+            GlStateManager.loadIdentity();
+            GlStateManager.matrixMode(5888);
+            GlStateManager.loadIdentity();
+            GlStateManager.disableCull();
+            Minecraft.getMinecraft().entityRenderer.setupOverlayRendering();
+            ShaderUtil.useProgram(0);
+            //glColor4f(0,1,1,1);
+            glBindTexture(GL_TEXTURE_2D,tex);
+			glBegin(GL_QUADS);
+			glTexCoord2f(0,0); glVertex3f(0,0,0);
+			glTexCoord2f(1,0); glVertex3f(Minecraft.getMinecraft().displayWidth,0,0);
+			glTexCoord2f(1,1); glVertex3f(Minecraft.getMinecraft().displayWidth,Minecraft.getMinecraft().displayHeight,0);
+			glTexCoord2f(0,1); glVertex3f(0,Minecraft.getMinecraft().displayHeight,0);
+			glEnd();
+		}*/
 	}
 	
 	@SubscribeEvent
@@ -248,11 +315,11 @@ public class EventManager {
 			e.getLightList().add(new Light((float)TileEntityRendererDispatcher.staticPlayerX,
 					(float)TileEntityRendererDispatcher.staticPlayerY+0.1f,
 					(float)TileEntityRendererDispatcher.staticPlayerZ,
-					1f, 0.125f, 0.125f, 4f, 4));
+					1f, 1f, 0.75f, 0.75f, 12));
 			e.getLightList().add(new Light((float)TileEntityRendererDispatcher.staticPlayerX,
 					(float)TileEntityRendererDispatcher.staticPlayerY+0.1f,
 					(float)TileEntityRendererDispatcher.staticPlayerZ,
-					1f, 0.5f, 0.125f, 0.75f, 14));
+					1f, 1f, 0.75f, 2.25f, 4));
 		}
 	}*/
 }

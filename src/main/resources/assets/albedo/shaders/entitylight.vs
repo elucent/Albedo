@@ -27,7 +27,7 @@ uniform int lightingEnabled;
 uniform sampler2D brightlayer;
 
 float rand2(vec2 co){
-    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+    return fract(sin(dot(co.xy ,vec2(12.9898f,78.233f))) * 43758.5453f);
 }
 
 vec3 rand3(vec3 co){
@@ -35,7 +35,7 @@ vec3 rand3(vec3 co){
 }
 
 float rand3f(vec3 co){
-    return fract(sin(dot(co.xyz ,vec3(48.7731, 12.9898,78.233))) * 43758.5453);
+    return fract(sin(dot(co.xyz ,vec3(48.7731f, 12.9898f,78.233f))) * 43758.5453f);
 }
 
 vec3 rand3v(vec3 co){
@@ -83,7 +83,7 @@ void main()
 		for (int i = 0; i < lightCount; i ++){
 			if (distSq(lights[i].position,position) <= pow(lights[i].radius,2)){
 				float faceexposure = 1.0f;
-				float intensity = pow(max(0f,1.0f-distance(lights[i].position,position)/(lights[i].radius)),2) * 1.0f * lights[i].color.w * ((max(0,faceexposure)+0.5f)/1.5f);
+				float intensity = pow(max(0,1.0f-distance(lights[i].position,position)/(lights[i].radius)),2) * 1.0f * lights[i].color.w * ((max(0,faceexposure)+0.5f)/1.5f);
 				sumR += (intensity/totalIntens)*lights[i].color.x;
 				sumG += (intensity/totalIntens)*lights[i].color.y;
 				sumB += (intensity/totalIntens)*lights[i].color.z;
@@ -102,7 +102,7 @@ void main()
 			diff = clamp(diff, 0.0f, 1.0f);     
 		   
 			/*vec4 spec = gl_FrontLightProduct[i].specular 
-				* pow(max(dot(R,E),0.0),gl_FrontMaterial.shininess);
+				* pow(max(dot(R,E),0.0f),gl_FrontMaterial.shininess);
 			spec = clamp(spec, 0.0f, 1.0f); */
 			
 			//ambtot += amb;

@@ -3,6 +3,7 @@ package elucent.albedo.util;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
+import elucent.albedo.ConfigManager;
 import elucent.albedo.EventManager;
 import elucent.albedo.event.RenderChunkUniformsEvent;
 import elucent.albedo.item.ItemRenderRegistry;
@@ -25,7 +26,7 @@ public class RenderUtil {
 	public static boolean enabledLast = false;
 	
 	public static void enableLightingUniforms(){
-		if (!EventManager.isGui){
+		if (!EventManager.isGui && ConfigManager.enableLights){
 			if (enabledLast){
 				ShaderUtil.useProgram(previousShader);
 				enabledLast = false;
@@ -38,7 +39,7 @@ public class RenderUtil {
 	}
 	
 	public static void disableLightingUniforms(){
-		if (!EventManager.isGui){
+		if (!EventManager.isGui && ConfigManager.enableLights){
 			if (ShaderUtil.currentProgram == ShaderUtil.entityLightProgram){
 				int lightPos = GL20.glGetUniformLocation(ShaderUtil.currentProgram, "lightingEnabled");
 				GL20.glUniform1i(lightPos, 0);
@@ -52,14 +53,14 @@ public class RenderUtil {
 	}
 	
 	public static void enableFogUniforms(){
-		if (ShaderUtil.currentProgram == ShaderUtil.entityLightProgram){
+		if (ShaderUtil.currentProgram == ShaderUtil.entityLightProgram && ConfigManager.enableLights){
 			int lightPos = GL20.glGetUniformLocation(ShaderUtil.currentProgram, "fogIntensity");
 			GL20.glUniform1f(lightPos, Minecraft.getMinecraft().world.provider.getDimensionType() == DimensionType.NETHER ? 0.015625f : 1.0f);
 		}
 	}
 	
 	public static void disableFogUniforms(){
-		if (ShaderUtil.currentProgram == ShaderUtil.entityLightProgram){
+		if (ShaderUtil.currentProgram == ShaderUtil.entityLightProgram && ConfigManager.enableLights){
 			int lightPos = GL20.glGetUniformLocation(ShaderUtil.currentProgram, "fogIntensity");
 			GL20.glUniform1f(lightPos, 0);
 		}

@@ -28,10 +28,12 @@ public class ShaderUtil implements IResourceManagerReloadListener {
 	public static int currentProgram = -1;
 	public static int fastLightProgram = 0;
 	public static int entityLightProgram = 0;
+	public static int depthProgram = 0;
 	
 	public static void init(){
 		fastLightProgram = loadProgram("/assets/"+Albedo.MODID+"/shaders/fastlight.vs","/assets/"+Albedo.MODID+"/shaders/fastlight.fs");
 		entityLightProgram = loadProgram("/assets/"+Albedo.MODID+"/shaders/entitylight.vs","/assets/"+Albedo.MODID+"/shaders/entitylight.fs");
+		depthProgram = loadProgram("/assets/"+Albedo.MODID+"/shaders/depth.vs","/assets/"+Albedo.MODID+"/shaders/depth.fs");
 	}
 	
 	public static int loadProgram(String vsh, String fsh){

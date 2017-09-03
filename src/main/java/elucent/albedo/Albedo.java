@@ -16,7 +16,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class Albedo
 {
     public static final String MODID = "albedo";
-    public static final String VERSION = "0.1";
+    public static final String VERSION = "0.1.1";
     public static final String NAME = "Albedo";
     public static boolean inited = false;
     
