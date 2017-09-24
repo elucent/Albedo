@@ -10,10 +10,16 @@ import net.minecraftforge.fml.client.config.GuiConfig;
 import net.minecraftforge.fml.client.config.IConfigElement;
 
 public class GuiAlbedoConfig extends GuiConfig {
+	
+	public static <T> List<T> join(List<T> a, List<T> b){
+		List<T> c = a;
+		c.addAll(b);
+		return c;
+	}
 
 	public GuiAlbedoConfig(GuiScreen parentScreen) {
 		super(parentScreen, 
-				new ConfigElement(ConfigManager.config.getCategory("light")).getChildElements(), 
+				join(new ConfigElement(ConfigManager.config.getCategory("light")).getChildElements(),new ConfigElement(ConfigManager.config.getCategory("misc")).getChildElements()), 
 				Albedo.MODID, 
 				false, 
 				false, 

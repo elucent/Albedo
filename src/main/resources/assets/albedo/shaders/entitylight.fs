@@ -14,6 +14,7 @@ uniform sampler2D brightlayer;
 uniform vec3 playerPos;
 uniform vec4 colorMult;
 uniform float fogIntensity;
+uniform int bits;
 
 float round(float f){
 	if (fract(f) < 0.5f){
@@ -53,7 +54,9 @@ void main()
 	//}
 	
 	vec4 color = vec4((mix(baseColor.xyz*lightdark,baseColor.xyz*lcolor.xyz,intens)),baseColor.w);
-	//color = vec4(vec3(pow(color.x,1.5f),pow(color.y,1.5f),pow(color.z,1.5f))*1.25f,color.w);
-	//color = vec4(round(color.x*8.0f)/8.0f,round(color.y*8.0f)/8.0f,round(color.z*4.0f)/4.0f,color.w);
+	if (bits == 1){
+		color = vec4(vec3(pow(color.x,1.5f),pow(color.y,1.5f),pow(color.z,1.5f))*1.25f,color.w);
+		color = vec4(round(color.x*8.0f)/8.0f,round(color.y*8.0f)/8.0f,round(color.z*4.0f)/4.0f,color.w);
+	}
 	gl_FragColor = vec4(color.xyz * lightsum,color.w);
 }

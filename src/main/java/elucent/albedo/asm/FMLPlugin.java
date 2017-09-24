@@ -5,7 +5,7 @@ import java.util.Map;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 
 @IFMLLoadingPlugin.TransformerExclusions({"elucent.albedo.asm"})
-@IFMLLoadingPlugin.MCVersion("1.12.1")
+@IFMLLoadingPlugin.MCVersion("1.12.2")
 @IFMLLoadingPlugin.SortingIndex(65536)
 public class FMLPlugin implements IFMLLoadingPlugin {
 	public static boolean runtimeDeobfEnabled = false;

@@ -69,6 +69,11 @@ public class EventManager {
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_BYTE, ByteBuffer.allocateDirect(w*h*4));*/
 	}
 	
+	public void checkBitNightmare(){
+		int bitLoc = GL20.glGetUniformLocation(ShaderUtil.currentProgram, "bits");
+		GL20.glUniform1i(bitLoc, ConfigManager.eightBitNightmare ? 1 : 0);
+	}
+	
 	@SubscribeEvent
 	public void onProfilerChange(ProfilerStartEvent event){
 		section = event.getSection();
@@ -86,6 +91,7 @@ public class EventManager {
 				isGui = false;
 				precedesEntities = true;
 				ShaderUtil.useProgram(ShaderUtil.fastLightProgram);
+				checkBitNightmare();
 				int tickLoc = GL20.glGetUniformLocation(ShaderUtil.currentProgram, "ticks");
 				GL20.glUniform1f(tickLoc, (float)ticks + Minecraft.getMinecraft().getRenderPartialTicks());
 				int texloc = GL20.glGetUniformLocation(ShaderUtil.currentProgram, "sampler");
@@ -103,6 +109,7 @@ public class EventManager {
 					ShaderUtil.useProgram(ShaderUtil.fastLightProgram);
 					LightManager.uploadLights();
 					ShaderUtil.useProgram(ShaderUtil.entityLightProgram);
+					checkBitNightmare();
 					tickLoc = GL20.glGetUniformLocation(ShaderUtil.currentProgram, "ticks");
 					GL20.glUniform1f(tickLoc, (float)ticks + Minecraft.getMinecraft().getRenderPartialTicks());
 					texloc = GL20.glGetUniformLocation(ShaderUtil.currentProgram, "sampler");
@@ -242,9 +249,10 @@ public class EventManager {
 		}
 	}
 	
-	@SideOnly(Side.CLIENT)
+	/*@SideOnly(Side.CLIENT)
 	@SubscribeEvent
 	public void onRenderLiving(RenderLivingEvent event){
+		System.out.println("TEST");
 		if (ConfigManager.enableLights){
 			if ((event.getEntity()).isPotionActive(Potion.getPotionFromResourceLocation("glowing"))){
 				ShaderUtil.useProgram(0);
@@ -256,9 +264,8 @@ public class EventManager {
 				int colorMult = GL20.glGetUniformLocation(ShaderUtil.currentProgram, "colorMult");
 				GL20.glUniform4f(colorMult, 1.0f, 1.0f, 1.0f, 0.0f);
 			}
-			ICustomModelLoader m;
 		}
-	}
+	}*/
 	
 	@SubscribeEvent
 	public void onRenderTileEntity(RenderTileEntityEvent event){
@@ -309,17 +316,17 @@ public class EventManager {
 		}
 	}
 	
-	/*@SubscribeEvent
+	@SubscribeEvent
 	public void onGatherLights(GatherLightsEvent e){
-		if (Minecraft.getMinecraft().player != null){
+		/*if (Minecraft.getMinecraft().player != null){
 			e.getLightList().add(new Light((float)TileEntityRendererDispatcher.staticPlayerX,
-					(float)TileEntityRendererDispatcher.staticPlayerY+0.1f,
+					(float)TileEntityRendererDispatcher.staticPlayerY+Minecraft.getMinecraft().player.getEyeHeight(),
 					(float)TileEntityRendererDispatcher.staticPlayerZ,
-					1f, 1f, 0.75f, 0.75f, 12));
+					1.0f, 0.75f, 0.25f, 0.75f, 16));
 			e.getLightList().add(new Light((float)TileEntityRendererDispatcher.staticPlayerX,
-					(float)TileEntityRendererDispatcher.staticPlayerY+0.1f,
+					(float)TileEntityRendererDispatcher.staticPlayerY+Minecraft.getMinecraft().player.getEyeHeight(),
 					(float)TileEntityRendererDispatcher.staticPlayerZ,
-					1f, 1f, 0.75f, 2.25f, 4));
-		}
-	}*/
+					1.0f, 0.75f, 0.25f, 1.5f, 8));
+		}*/
+	}
 }

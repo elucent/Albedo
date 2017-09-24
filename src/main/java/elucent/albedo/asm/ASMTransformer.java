@@ -17,6 +17,7 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ChunkRenderContainer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.launchwrapper.IClassTransformer;
 
@@ -85,7 +86,7 @@ public class ASMTransformer implements IClassTransformer {
                             "setTransform", "("+transformTypeName+")V", false);
                     code.insertBefore(code.get(2), method);
                 	code.insertBefore(code.get(2), new VarInsnNode(Opcodes.ALOAD, paramloc));
-                    //System.out.println("Successfully patched ForgeHooksClient!");
+                    System.out.println("Successfully patched ForgeHooksClient!");
                 }
                 else {
                 }
@@ -186,14 +187,14 @@ public class ASMTransformer implements IClassTransformer {
 				MethodInsnNode method = new MethodInsnNode(Opcodes.INVOKESTATIC, "elucent/albedo/util/RenderUtil",
                         "enableLightingUniforms", "()V", false);
                 code.insertBefore(code.get(2), method);
-    	    	//System.out.println("Successfully loaded GlStateManager ASM!");
+    	    	System.out.println("Successfully loaded GlStateManager ASM!");
             }
 			if (m.name.compareTo(disableLighting) == 0){
 				InsnList code = m.instructions;
 				MethodInsnNode method = new MethodInsnNode(Opcodes.INVOKESTATIC, "elucent/albedo/util/RenderUtil",
                         "disableLightingUniforms", "()V", false);
                 code.insertBefore(code.get(2), method);
-    	    	//System.out.println("Successfully loaded GlStateManager ASM!");
+    	    	System.out.println("Successfully loaded GlStateManager ASM!");
             }
 		}
 		
@@ -243,7 +244,7 @@ public class ASMTransformer implements IClassTransformer {
                             "postNewEvent", "("+entityName+")V", false);
                     code.insertBefore(code.get(2), method);
                     code.insertBefore(code.get(2), new VarInsnNode(Opcodes.ALOAD, paramloc));
-                	//System.out.println("Successfully loaded TileEntityRendererDispatcher ASM!");
+                	System.out.println("Successfully loaded TileEntityRendererDispatcher ASM!");
                 }
                 else {
                 }
@@ -266,7 +267,7 @@ public class ASMTransformer implements IClassTransformer {
 			targetDesc = "(Lnet/minecraft/entity/Entity;DDDFFZ)V";
 		}
 		else {
-			targetMethod = "doRenderEntity";
+			targetMethod = "renderEntity";
 			entityName = "Lnet/minecraft/entity/Entity;";
 			targetDesc = "(Lnet/minecraft/entity/Entity;DDDFFZ)V";
 		}
@@ -279,7 +280,7 @@ public class ASMTransformer implements IClassTransformer {
 		
 		for (MethodNode m : methods){
 			if (m.name.compareTo(targetMethod) == 0 && m.desc.compareTo(targetDesc) == 0){
-            	////System.out.println("Attempting to load RenderManager ASM...");
+            	//System.out.println("Attempting to load RenderManager ASM...");
 				InsnList code = m.instructions;
 				List<LocalVariableNode> vars = m.localVariables;
 				int paramloc = 1;
@@ -298,7 +299,7 @@ public class ASMTransformer implements IClassTransformer {
                             "postNewEvent", "("+entityName+")V", false);
                     code.insertBefore(code.get(2), method);
                     code.insertBefore(code.get(2), new VarInsnNode(Opcodes.ALOAD, paramloc));
-                	//System.out.println("Successfully loaded RenderManager ASM!");
+                	System.out.println("Successfully loaded RenderManager ASM!");
                 }
                 else {
                 }
@@ -354,7 +355,7 @@ public class ASMTransformer implements IClassTransformer {
                             "postNewEvent", "(Ljava/lang/String;)V", false);
                     code.insertBefore(code.get(2), method);
                     code.insertBefore(code.get(2), new VarInsnNode(Opcodes.ALOAD, paramloc));
-                	//System.out.println("Successfully loaded Profiler ASM!");
+                	System.out.println("Successfully loaded Profiler ASM!");
                 }
                 else {
                 }
@@ -413,7 +414,7 @@ public class ASMTransformer implements IClassTransformer {
                 	MethodInsnNode method = new MethodInsnNode(Opcodes.INVOKESTATIC, "elucent/albedo/util/RenderUtil",
                             "renderChunkUniforms", "("+renderChunkName+")V", false);
                     code.insertBefore(returnNode, method);
-                    //System.out.println("Successfully loaded RenderChunk ASM!");
+                    System.out.println("Successfully loaded RenderChunk ASM!");
                 }
                 else {
                 }

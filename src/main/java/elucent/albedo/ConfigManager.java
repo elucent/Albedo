@@ -13,6 +13,9 @@ public class ConfigManager {
 	//LIGHTING
 	public static int maxLights;
 	public static boolean enableLights;
+	
+	//MISC
+	public static boolean eightBitNightmare;
 
 	public static void init(File configFile){
 		if(config == null)
@@ -24,9 +27,12 @@ public class ConfigManager {
 	
 	public static void load(){
 		config.addCustomCategoryComment("light", "Settings related to lighting.");
+		config.addCustomCategoryComment("misc", "Settings related to random effects.");
 		
 		maxLights = config.getInt("maxLights", "light", 10, 0, 100, "The maximum number of lights allowed to render in a scene. Lights are sorted nearest-first, so further-away lights will be culled after nearer lights.");
 		enableLights = config.getBoolean("enableLights", "light", true, "Enables lighting in general.");
+		
+		eightBitNightmare = config.getBoolean("eightBitNightmare", "misc", false, "Enables retro mode.");
 		
 		if (config.hasChanged())
 		{
